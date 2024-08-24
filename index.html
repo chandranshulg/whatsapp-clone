@@ -178,6 +178,39 @@
             padding: 10px;
             cursor: pointer;
         }
+        .reactions {
+            display: flex;
+            margin-top: 5px;
+        }
+        .reaction {
+            font-size: 18px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .edit-message {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .edit-message input {
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+            width: 150px;
+        }
+        .edit-message button {
+            background-color: #075E54;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -243,19 +276,22 @@
                 statusElement.classList.add('status');
                 statusElement.textContent = 'Sent';
 
-                const actionsElement = document.createElement('div');
-                actionsElement.classList.add('message-actions');
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.onclick = () => deleteMessage(messageElement);
-                actionsElement.appendChild(deleteButton);
-                messageElement.appendChild(actionsElement);
+                const reactionsElement = document.createElement('div');
+                reactionsElement.classList.add('reactions');
+                ['👍', '❤️', '😂', '😢', '😡'].forEach(reaction => {
+                    const reactionElement = document.createElement('span');
+                    reactionElement.textContent = reaction;
+                    reactionElement.classList.add('reaction');
+                    reactionElement.onclick = () => addReaction(messageElement, reaction);
+                    reactionsElement.appendChild(reactionElement);
+                });
 
                 messageElement.appendChild(timestampElement);
                 messageElement.appendChild(statusElement);
+                messageElement.appendChild(reactionsElement);
+
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-                messageInput.value = '';
 
                 // Simulate status updates
                 setTimeout(() => {
@@ -265,17 +301,24 @@
                 setTimeout(() => {
                     statusElement.textContent = 'Read';
                 }, 1000);
+
+                // Clear input field
+                messageInput.value = '';
             }
+        }
+
+        // Function to add a reaction to a message
+        function addReaction(messageElement, reaction) {
+            const reactions = messageElement.querySelector('.reactions');
+            const reactionElement = document.createElement('span');
+            reactionElement.textContent = reaction;
+            reactionElement.classList.add('reaction');
+            reactions.appendChild(reactionElement);
         }
 
         // Function to send a message
         function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (messageText !== '') {
-                const user = Math.random() < 0.5 ? 1 : 2; // Randomly choose between User 1 or User 2
-                sendUserMessage(user);
-                receiveMessage(); // Simulate receiving a reply
-            }
+            sendUserMessage(1); // Sending message as User 1
         }
 
         // Function to send an image
@@ -363,6 +406,26 @@
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             }, 1000);
+        }
+
+        // Function to edit a message
+        function editMessage(messageElement) {
+            const editContainer = document.createElement('div');
+            editContainer.classList.add('edit-message');
+            const editInput = document.createElement('input');
+            editInput.type = 'text';
+            editInput.value = messageElement.textContent;
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.onclick = () => {
+                messageElement.textContent = editInput.value;
+                messageElement.appendChild(messageElement.querySelector('.timestamp'));
+                messageElement.appendChild(messageElement.querySelector('.status'));
+                chatWindow.removeChild(editContainer);
+            };
+            editContainer.appendChild(editInput);
+            editContainer.appendChild(saveButton);
+            chatWindow.appendChild(editContainer);
         }
 
         // Function to delete a message
