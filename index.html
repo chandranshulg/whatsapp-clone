@@ -63,6 +63,14 @@
             max-width: 100%;
             border-radius: 5px;
         }
+        .audio-message {
+            display: flex;
+            align-items: center;
+        }
+        .audio-message audio {
+            margin-left: 10px;
+            width: 200px;
+        }
         footer {
             background-color: #FFF;
             padding: 10px;
@@ -121,6 +129,14 @@
             padding: 5px;
             cursor: pointer;
         }
+        #audio-button {
+            cursor: pointer;
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -133,6 +149,7 @@
     <footer>
         <label for="file-input" id="file-label">📷</label>
         <input type="file" id="file-input" accept="image/*">
+        <button id="audio-button">🎤</button>
         <button id="emoji-button">😊</button>
         <div id="emoji-picker">
             <span class="emoji">😊</span>
@@ -157,6 +174,7 @@
         const emojiPicker = document.getElementById('emoji-picker');
         const fileInput = document.getElementById('file-input');
         const fileLabel = document.getElementById('file-label');
+        const audioButton = document.getElementById('audio-button');
 
         // Function to get the current time as a formatted string
         function getCurrentTime() {
@@ -233,13 +251,47 @@
             receiveMessage(); // Simulate receiving a reply
         }
 
+        // Function to send a voice note
+        function sendAudio() {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'sent', 'audio-message');
+
+            const audioElement = document.createElement('audio');
+            audioElement.controls = true;
+            audioElement.src = "https://www.soundjay.com/button/beep-07.wav"; // Placeholder for audio file
+
+            const timestampElement = document.createElement('span');
+            timestampElement.classList.add('timestamp');
+            timestampElement.textContent = getCurrentTime();
+
+            const statusElement = document.createElement('span');
+            statusElement.classList.add('status');
+            statusElement.textContent = 'Sent';
+
+            messageElement.appendChild(audioElement);
+            messageElement.appendChild(timestampElement);
+            messageElement.appendChild(statusElement);
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulate status updates
+            setTimeout(() => {
+                statusElement.textContent = 'Delivered';
+            }, 500); // Update to "Delivered" after 0.5 seconds
+
+            setTimeout(() => {
+                statusElement.textContent = 'Read';
+            }, 1000); // Update to "Read" after 1 second
+
+            receiveMessage(); // Simulate receiving a reply
+        }
+
         // Function to simulate receiving a message
         function receiveMessage() {
             setTimeout(() => {
-                const replyText = "This is an auto-reply.";
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'received');
-                messageElement.textContent = replyText;
+                messageElement.textContent = 'This is a reply.';
 
                 const timestampElement = document.createElement('span');
                 timestampElement.classList.add('timestamp');
@@ -247,34 +299,36 @@
 
                 messageElement.appendChild(timestampElement);
                 chatWindow.appendChild(messageElement);
-                chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
-            }, 1000); // Delay the reply by 1 second
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 1500);
         }
 
-        // Show/hide emoji picker
-        emojiButton.addEventListener('click', () => {
-            emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'flex' : 'none';
-        });
-
-        // Add emoji to message input
-        emojiPicker.addEventListener('click', (event) => {
-            if (event.target.classList.contains('emoji')) {
-                messageInput.value += event.target.textContent;
-            }
-        });
-
-        // Send message when the button is clicked
+        // Event listener for send button
         sendButton.addEventListener('click', sendMessage);
 
-        // Send message when 'Enter' key is pressed
-        messageInput.addEventListener('keydown', function(event) {
+        // Event listener for pressing 'Enter' key
+        messageInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        // Handle image file input
-        fileInput.addEventListener('change', (event) => {
+        // Event listener for emoji button
+        emojiButton.addEventListener('click', function() {
+            emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'flex' : 'none';
+        });
+
+        // Event listener for emoji selection
+        emojiPicker.addEventListener('click', function(event) {
+            if (event.target.classList.contains('emoji')) {
+                messageInput.value += event.target.textContent;
+                emojiPicker.style.display = 'none';
+                messageInput.focus();
+            }
+        });
+
+        // Event listener for file input change (image upload)
+        fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -284,6 +338,9 @@
                 reader.readAsDataURL(file);
             }
         });
+
+        // Event listener for audio button
+        audioButton.addEventListener('click', sendAudio);
 
     </script>
 </body>
