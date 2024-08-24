@@ -35,6 +35,7 @@
             background-color: #DCF8C6;
             border-radius: 5px;
             max-width: 70%;
+            position: relative;
         }
         .message.received {
             background-color: #FFF;
@@ -42,6 +43,13 @@
         }
         .message.sent {
             align-self: flex-end;
+        }
+        .timestamp {
+            font-size: 10px;
+            color: #666;
+            position: absolute;
+            bottom: -15px;
+            right: 10px;
         }
         footer {
             background-color: #FFF;
@@ -83,6 +91,12 @@
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
 
+        // Function to get the current time as a formatted string
+        function getCurrentTime() {
+            const now = new Date();
+            return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        }
+
         // Function to send a message
         function sendMessage() {
             const messageText = messageInput.value.trim();
@@ -90,6 +104,12 @@
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'sent');
                 messageElement.textContent = messageText;
+
+                const timestampElement = document.createElement('span');
+                timestampElement.classList.add('timestamp');
+                timestampElement.textContent = getCurrentTime();
+
+                messageElement.appendChild(timestampElement);
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
                 messageInput.value = ''; // Clear the input field
@@ -104,6 +124,12 @@
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'received');
                 messageElement.textContent = replyText;
+
+                const timestampElement = document.createElement('span');
+                timestampElement.classList.add('timestamp');
+                timestampElement.textContent = getCurrentTime();
+
+                messageElement.appendChild(timestampElement);
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
             }, 1000); // Delay the reply by 1 second
