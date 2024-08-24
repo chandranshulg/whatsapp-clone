@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,28 +15,13 @@
             flex-direction: column;
             height: 100vh;
         }
-
         header {
             background-color: #075E54;
             color: white;
             padding: 10px;
             text-align: center;
             font-size: 24px;
-            position: relative;
         }
-
-        #search-bar {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-        }
-
-        #search-input {
-            padding: 5px;
-            border: 1px solid #CCC;
-            border-radius: 5px;
-        }
-
         #chat-window {
             flex: 1;
             padding: 10px;
@@ -45,30 +29,29 @@
             display: flex;
             flex-direction: column;
         }
-
         .message {
             margin: 10px 0;
             padding: 10px;
-            background-color: #DCF8C6;
             border-radius: 5px;
             max-width: 70%;
             position: relative;
             word-wrap: break-word;
         }
-
         .message.received {
             background-color: #FFF;
             align-self: flex-start;
         }
-
         .message.sent {
+            background-color: #DCF8C6;
             align-self: flex-end;
         }
-
-        .highlight {
-            background-color: yellow !important;
+        /* New Styles for User-Specific Message Colors */
+        .message.user-1 {
+            background-color: #9DE1FE; /* Light Blue for User 1 */
         }
-
+        .message.user-2 {
+            background-color: #FFD700; /* Gold for User 2 */
+        }
         .timestamp {
             font-size: 10px;
             color: #666;
@@ -76,7 +59,6 @@
             bottom: -15px;
             right: 50px;
         }
-
         .status {
             font-size: 10px;
             color: #666;
@@ -84,21 +66,24 @@
             bottom: -15px;
             right: 10px;
         }
-
-        .reaction {
-            font-size: 16px;
-            position: absolute;
-            bottom: -30px;
-            left: 10px;
+        .image-message img {
+            max-width: 100%;
+            border-radius: 5px;
         }
-
+        .audio-message {
+            display: flex;
+            align-items: center;
+        }
+        .audio-message audio {
+            margin-left: 10px;
+            width: 200px;
+        }
         footer {
             background-color: #FFF;
             padding: 10px;
             display: flex;
             align-items: center;
         }
-
         input[type="text"] {
             flex: 1;
             padding: 10px;
@@ -106,7 +91,17 @@
             border-radius: 20px;
             outline: none;
         }
-
+        input[type="file"] {
+            display: none;
+        }
+        #file-label {
+            cursor: pointer;
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
         button {
             background-color: #075E54;
             color: white;
@@ -116,22 +111,18 @@
             margin-left: 10px;
             cursor: pointer;
         }
-
-        #emoji-button,
-        #audio-button,
-        #gif-button {
+        #emoji-button {
             margin-right: 10px;
             font-size: 24px;
             cursor: pointer;
             background: none;
             border: none;
         }
-
-        #emoji-picker,
-        #gif-picker {
+        #emoji-picker {
             display: none;
             position: absolute;
             bottom: 50px;
+            left: 10px;
             background: white;
             border: 1px solid #CCC;
             border-radius: 5px;
@@ -140,31 +131,32 @@
             display: flex;
             flex-wrap: wrap;
         }
-
-        .emoji,
-        .gif-option {
+        .emoji {
+            font-size: 24px;
+            padding: 5px;
             cursor: pointer;
         }
-
-        .gif-option {
-            width: 50px;
-            height: 50px;
-            margin: 5px;
+        #audio-button {
+            cursor: pointer;
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
         }
     </style>
 </head>
-
 <body>
     <header>
         WhatsApp Clone
-        <div id="search-bar">
-            <input type="text" id="search-input" placeholder="Search messages...">
-        </div>
     </header>
     <div id="chat-window">
         <!-- Chat messages will be added here -->
     </div>
     <footer>
+        <label for="file-input" id="file-label">📷</label>
+        <input type="file" id="file-input" accept="image/*">
+        <button id="audio-button">🎤</button>
         <button id="emoji-button">😊</button>
         <div id="emoji-picker">
             <span class="emoji">😊</span>
@@ -177,12 +169,6 @@
             <span class="emoji">🙏</span>
             <span class="emoji">😍</span>
         </div>
-        <button id="gif-button">GIF</button>
-        <div id="gif-picker">
-            <img src="https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif" class="gif-option" alt="gif">
-            <img src="https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif" class="gif-option" alt="gif">
-            <img src="https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif" class="gif-option" alt="gif">
-        </div>
         <input type="text" id="message-input" placeholder="Type a message">
         <button id="send-button">Send</button>
     </footer>
@@ -191,21 +177,24 @@
         const chatWindow = document.getElementById('chat-window');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
-        const searchInput = document.getElementById('search-input');
+        const emojiButton = document.getElementById('emoji-button');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const fileInput = document.getElementById('file-input');
+        const fileLabel = document.getElementById('file-label');
+        const audioButton = document.getElementById('audio-button');
 
-        // Existing functions for sending messages, emojis, gifs, etc.
-
+        // Function to get the current time as a formatted string
         function getCurrentTime() {
             const now = new Date();
             return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
         }
 
-        // Function to send a message
-        function sendMessage() {
+        // Function to send a user-specific message
+        function sendUserMessage(user) {
             const messageText = messageInput.value.trim();
             if (messageText !== '') {
                 const messageElement = document.createElement('div');
-                messageElement.classList.add('message', 'sent');
+                messageElement.classList.add('message', `user-${user}`, 'sent');
                 messageElement.textContent = messageText;
 
                 const timestampElement = document.createElement('span');
@@ -220,7 +209,6 @@
                 messageElement.appendChild(statusElement);
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-
                 messageInput.value = '';
 
                 // Simulate status updates
@@ -234,30 +222,133 @@
             }
         }
 
+        // Function to send a message
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText !== '') {
+                const user = Math.random() < 0.5 ? 1 : 2; // Randomly choose between User 1 or User 2
+                sendUserMessage(user);
+                receiveMessage(); // Simulate receiving a reply
+            }
+        }
+
+        // Function to send an image
+        function sendImage(imageSrc) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'sent', 'image-message');
+
+            const imgElement = document.createElement('img');
+            imgElement.src = imageSrc;
+
+            const timestampElement = document.createElement('span');
+            timestampElement.classList.add('timestamp');
+            timestampElement.textContent = getCurrentTime();
+
+            const statusElement = document.createElement('span');
+            statusElement.classList.add('status');
+            statusElement.textContent = 'Sent';
+
+            messageElement.appendChild(imgElement);
+            messageElement.appendChild(timestampElement);
+            messageElement.appendChild(statusElement);
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulate status updates
+            setTimeout(() => {
+                statusElement.textContent = 'Delivered';
+            }, 500);
+
+            setTimeout(() => {
+                statusElement.textContent = 'Read';
+            }, 1000);
+
+            receiveMessage(); // Simulate receiving a reply
+        }
+
+        // Function to send a voice note
+        function sendAudio() {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'sent', 'audio-message');
+
+            const audioElement = document.createElement('audio');
+            audioElement.controls = true;
+            audioElement.src = "https://www.soundjay.com/button/beep-07.wav"; // Placeholder for audio file
+
+            const timestampElement = document.createElement('span');
+            timestampElement.classList.add('timestamp');
+            timestampElement.textContent = getCurrentTime();
+
+            const statusElement = document.createElement('span');
+            statusElement.classList.add('status');
+            statusElement.textContent = 'Sent';
+
+            messageElement.appendChild(audioElement);
+            messageElement.appendChild(timestampElement);
+            messageElement.appendChild(statusElement);
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulate status updates
+            setTimeout(() => {
+                statusElement.textContent = 'Delivered';
+            }, 500);
+
+            setTimeout(() => {
+                statusElement.textContent = 'Read';
+            }, 1000);
+
+            receiveMessage(); // Simulate receiving a reply
+        }
+
+        // Function to receive a message
+        function receiveMessage() {
+            setTimeout(() => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'received');
+                messageElement.textContent = 'Hello, how can I help you?';
+
+                const timestampElement = document.createElement('span');
+                timestampElement.classList.add('timestamp');
+                timestampElement.textContent = getCurrentTime();
+
+                const statusElement = document.createElement('span');
+                statusElement.classList.add('status');
+                statusElement.textContent = 'Read';
+
+                messageElement.appendChild(timestampElement);
+                messageElement.appendChild(statusElement);
+                chatWindow.appendChild(messageElement);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 1000);
+        }
+
         sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
+
+        emojiButton.addEventListener('click', () => {
+            emojiPicker.style.display = emojiPicker.style.display === 'none' || emojiPicker.style.display === '' ? 'flex' : 'none';
+        });
+
+        emojiPicker.addEventListener('click', (event) => {
+            if (event.target.classList.contains('emoji')) {
+                messageInput.value += event.target.textContent;
+                emojiPicker.style.display = 'none';
             }
         });
 
-        // Search function for messages
-        searchInput.addEventListener('input', function () {
-            const searchText = searchInput.value.toLowerCase();
-            const messages = chatWindow.querySelectorAll('.message');
-
-            messages.forEach(function (message) {
-                const messageText = message.textContent.toLowerCase();
-                if (messageText.includes(searchText)) {
-                    message.classList.add('highlight');
-                } else {
-                    message.classList.remove('highlight');
-                }
-            });
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => sendImage(reader.result);
+                reader.readAsDataURL(file);
+            }
         });
 
-        // Existing event listeners for emoji picker, gif picker, etc.
+        audioButton.addEventListener('click', sendAudio);
+
+        // Initialize chat with a sample message
+        receiveMessage();
     </script>
 </body>
-
 </html>
