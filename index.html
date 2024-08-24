@@ -45,7 +45,7 @@
             background-color: #DCF8C6;
             align-self: flex-end;
         }
-        /* New Styles for User-Specific Message Colors */
+        /* User-Specific Message Colors */
         .message.user-1 {
             background-color: #9DE1FE; /* Light Blue for User 1 */
         }
@@ -144,6 +144,40 @@
             border-radius: 50%;
             margin-right: 10px;
         }
+        #clear-button {
+            background-color: #FF3B30;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        #delete-button {
+            background-color: #FF9500;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .message-actions {
+            display: none;
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .message-actions button {
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -171,6 +205,8 @@
         </div>
         <input type="text" id="message-input" placeholder="Type a message">
         <button id="send-button">Send</button>
+        <button id="clear-button">Clear</button>
+        <button id="delete-button">Delete</button>
     </footer>
 
     <script>
@@ -182,6 +218,8 @@
         const fileInput = document.getElementById('file-input');
         const fileLabel = document.getElementById('file-label');
         const audioButton = document.getElementById('audio-button');
+        const clearButton = document.getElementById('clear-button');
+        const deleteButton = document.getElementById('delete-button');
 
         // Function to get the current time as a formatted string
         function getCurrentTime() {
@@ -204,6 +242,14 @@
                 const statusElement = document.createElement('span');
                 statusElement.classList.add('status');
                 statusElement.textContent = 'Sent';
+
+                const actionsElement = document.createElement('div');
+                actionsElement.classList.add('message-actions');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteMessage(messageElement);
+                actionsElement.appendChild(deleteButton);
+                messageElement.appendChild(actionsElement);
 
                 messageElement.appendChild(timestampElement);
                 messageElement.appendChild(statusElement);
@@ -239,6 +285,7 @@
 
             const imgElement = document.createElement('img');
             imgElement.src = imageSrc;
+            messageElement.appendChild(imgElement);
 
             const timestampElement = document.createElement('span');
             timestampElement.classList.add('timestamp');
@@ -248,7 +295,6 @@
             statusElement.classList.add('status');
             statusElement.textContent = 'Sent';
 
-            messageElement.appendChild(imgElement);
             messageElement.appendChild(timestampElement);
             messageElement.appendChild(statusElement);
             chatWindow.appendChild(messageElement);
@@ -262,18 +308,17 @@
             setTimeout(() => {
                 statusElement.textContent = 'Read';
             }, 1000);
-
-            receiveMessage(); // Simulate receiving a reply
         }
 
-        // Function to send a voice note
+        // Function to send audio
         function sendAudio() {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'sent', 'audio-message');
 
             const audioElement = document.createElement('audio');
             audioElement.controls = true;
-            audioElement.src = "https://www.soundjay.com/button/beep-07.wav"; // Placeholder for audio file
+            audioElement.src = 'path/to/audio/file'; // Replace with actual audio file
+            messageElement.appendChild(audioElement);
 
             const timestampElement = document.createElement('span');
             timestampElement.classList.add('timestamp');
@@ -283,7 +328,6 @@
             statusElement.classList.add('status');
             statusElement.textContent = 'Sent';
 
-            messageElement.appendChild(audioElement);
             messageElement.appendChild(timestampElement);
             messageElement.appendChild(statusElement);
             chatWindow.appendChild(messageElement);
@@ -297,8 +341,6 @@
             setTimeout(() => {
                 statusElement.textContent = 'Read';
             }, 1000);
-
-            receiveMessage(); // Simulate receiving a reply
         }
 
         // Function to receive a message
@@ -321,6 +363,16 @@
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             }, 1000);
+        }
+
+        // Function to delete a message
+        function deleteMessage(messageElement) {
+            chatWindow.removeChild(messageElement);
+        }
+
+        // Function to clear the chat window
+        function clearChat() {
+            chatWindow.innerHTML = '';
         }
 
         sendButton.addEventListener('click', sendMessage);
@@ -346,6 +398,15 @@
         });
 
         audioButton.addEventListener('click', sendAudio);
+
+        clearButton.addEventListener('click', clearChat);
+
+        deleteButton.addEventListener('click', () => {
+            const messages = document.querySelectorAll('.message');
+            if (messages.length > 0) {
+                deleteMessage(messages[messages.length - 1]);
+            }
+        });
 
         // Initialize chat with a sample message
         receiveMessage();
