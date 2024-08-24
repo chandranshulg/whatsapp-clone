@@ -93,7 +93,20 @@
                 chatWindow.appendChild(messageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
                 messageInput.value = ''; // Clear the input field
+                receiveMessage(); // Simulate receiving a reply
             }
+        }
+
+        // Function to simulate receiving a message
+        function receiveMessage() {
+            setTimeout(() => {
+                const replyText = "This is an auto-reply.";
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'received');
+                messageElement.textContent = replyText;
+                chatWindow.appendChild(messageElement);
+                chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+            }, 1000); // Delay the reply by 1 second
         }
 
         // Send message when the button is clicked
