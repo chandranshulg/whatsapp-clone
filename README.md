@@ -3,6 +3,7 @@
 This project is a simple clone of WhatsApp built with HTML, CSS, and JavaScript. It demonstrates various features commonly found in chat applications.
 
 ## Live demo 
+https://chandranshulg.github.io/whatsapp-clone/  
 
 
 ## Commits History
