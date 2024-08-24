@@ -21,6 +21,7 @@
             padding: 10px;
             text-align: center;
             font-size: 24px;
+            position: relative;
         }
         #chat-window {
             flex: 1;
@@ -211,14 +212,29 @@
             padding: 5px;
             cursor: pointer;
         }
+        #typing-indicator {
+            font-style: italic;
+            color: #666;
+            margin: 10px 0;
+            display: none;
+        }
+        .user-status {
+            font-size: 12px;
+            color: #075E54;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
     </style>
 </head>
 <body>
     <header>
         WhatsApp Clone
+        <span id="user-status" class="user-status">User is online</span>
     </header>
     <div id="chat-window">
         <!-- Chat messages will be added here -->
+        <div id="typing-indicator">User is typing...</div>
     </div>
     <footer>
         <label for="file-input" id="file-label">📷</label>
@@ -253,6 +269,10 @@
         const audioButton = document.getElementById('audio-button');
         const clearButton = document.getElementById('clear-button');
         const deleteButton = document.getElementById('delete-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const userStatus = document.getElementById('user-status');
+
+        let typingTimer; // Timer identifier for typing indicator
 
         // Function to get the current time as a formatted string
         function getCurrentTime() {
@@ -278,12 +298,13 @@
 
                 const reactionsElement = document.createElement('div');
                 reactionsElement.classList.add('reactions');
-                ['👍', '❤️', '😂', '😢', '😡'].forEach(reaction => {
-                    const reactionElement = document.createElement('span');
-                    reactionElement.textContent = reaction;
-                    reactionElement.classList.add('reaction');
-                    reactionElement.onclick = () => addReaction(messageElement, reaction);
-                    reactionsElement.appendChild(reactionElement);
+                const reactionButtons = ['👍', '❤️', '😂'];
+                reactionButtons.forEach(reaction => {
+                    const reactionButton = document.createElement('span');
+                    reactionButton.textContent = reaction;
+                    reactionButton.classList.add('reaction');
+                    reactionButton.addEventListener('click', () => addReaction(messageElement, reaction));
+                    reactionsElement.appendChild(reactionButton);
                 });
 
                 messageElement.appendChild(timestampElement);
@@ -438,6 +459,20 @@
             chatWindow.innerHTML = '';
         }
 
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                typingIndicator.style.display = 'none';
+            }, 2000);
+        }
+
+        // Function to update user status
+        function updateUserStatus(status) {
+            userStatus.textContent = `User is ${status}`;
+        }
+
         sendButton.addEventListener('click', sendMessage);
 
         emojiButton.addEventListener('click', () => {
@@ -470,6 +505,9 @@
                 deleteMessage(messages[messages.length - 1]);
             }
         });
+
+        // Simulate typing indicator and user status
+        messageInput.addEventListener('input', showTypingIndicator);
 
         // Initialize chat with a sample message
         receiveMessage();
