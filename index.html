@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ECE5DD;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+        }
+        #chat-window {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #DCF8C6;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+        .message.received {
+            background-color: #FFF;
+            align-self: flex-start;
+        }
+        .message.sent {
+            align-self: flex-end;
+        }
+        footer {
+            background-color: #FFF;
+            padding: 10px;
+            display: flex;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #CCC;
+            border-radius: 20px;
+            outline: none;
+        }
+        button {
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        WhatsApp Clone
+    </header>
+    <div id="chat-window">
+        <!-- Chat messages will be added here -->
+    </div>
+    <footer>
+        <input type="text" id="message-input" placeholder="Type a message">
+        <button id="send-button">Send</button>
+    </footer>
+</body>
+</html>
