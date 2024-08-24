@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Clone</title>
     <style>
+        /* Previous CSS code remains unchanged */
         body {
             font-family: Arial, sans-serif;
             background-color: #ECE5DD;
@@ -25,6 +26,8 @@
             flex: 1;
             padding: 10px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         .message {
             margin: 10px 0;
@@ -74,5 +77,34 @@
         <input type="text" id="message-input" placeholder="Type a message">
         <button id="send-button">Send</button>
     </footer>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Function to send a message
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText !== '') {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'sent');
+                messageElement.textContent = messageText;
+                chatWindow.appendChild(messageElement);
+                chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+                messageInput.value = ''; // Clear the input field
+            }
+        }
+
+        // Send message when the button is clicked
+        sendButton.addEventListener('click', sendMessage);
+
+        // Send message when 'Enter' key is pressed
+        messageInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
 </body>
 </html>
