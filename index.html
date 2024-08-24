@@ -137,6 +137,37 @@
             border-radius: 50%;
             margin-right: 10px;
         }
+
+        /* Add GIF button styling */
+        #gif-button {
+            cursor: pointer;
+            background-color: #075E54;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        #gif-picker {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            background: white;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 200px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .gif-option {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -162,6 +193,12 @@
             <span class="emoji">🙏</span>
             <span class="emoji">😍</span>
         </div>
+        <button id="gif-button">GIF</button>
+        <div id="gif-picker">
+            <img src="https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif" class="gif-option" alt="gif">
+            <img src="https://media.giphy.com/media/l0HlTy9x8FZo0XO1i/giphy.gif" class="gif-option" alt="gif">
+            <img src="https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif" class="gif-option" alt="gif">
+        </div>
         <input type="text" id="message-input" placeholder="Type a message">
         <button id="send-button">Send</button>
     </footer>
@@ -175,6 +212,8 @@
         const fileInput = document.getElementById('file-input');
         const fileLabel = document.getElementById('file-label');
         const audioButton = document.getElementById('audio-button');
+        const gifButton = document.getElementById('gif-button');
+        const gifPicker = document.getElementById('gif-picker');
 
         // Function to get the current time as a formatted string
         function getCurrentTime() {
@@ -247,18 +286,16 @@
             setTimeout(() => {
                 statusElement.textContent = 'Read';
             }, 1000); // Update to "Read" after 1 second
-
-            receiveMessage(); // Simulate receiving a reply
         }
 
-        // Function to send a voice note
-        function sendAudio() {
+        // Function to send an audio message
+        function sendAudio(audioSrc) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', 'sent', 'audio-message');
 
             const audioElement = document.createElement('audio');
+            audioElement.src = audioSrc;
             audioElement.controls = true;
-            audioElement.src = "https://www.soundjay.com/button/beep-07.wav"; // Placeholder for audio file
 
             const timestampElement = document.createElement('span');
             timestampElement.classList.add('timestamp');
@@ -282,66 +319,104 @@
             setTimeout(() => {
                 statusElement.textContent = 'Read';
             }, 1000); // Update to "Read" after 1 second
-
-            receiveMessage(); // Simulate receiving a reply
         }
 
-        // Function to simulate receiving a message
+        // Function to send a GIF
+        function sendGif(gifSrc) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'sent', 'image-message');
+
+            const imgElement = document.createElement('img');
+            imgElement.src = gifSrc;
+
+            const timestampElement = document.createElement('span');
+            timestampElement.classList.add('timestamp');
+            timestampElement.textContent = getCurrentTime();
+
+            const statusElement = document.createElement('span');
+            statusElement.classList.add('status');
+            statusElement.textContent = 'Sent';
+
+            messageElement.appendChild(imgElement);
+            messageElement.appendChild(timestampElement);
+            messageElement.appendChild(statusElement);
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulate status updates
+            setTimeout(() => {
+                statusElement.textContent = 'Delivered';
+            }, 500); // Update to "Delivered" after 0.5 seconds
+
+            setTimeout(() => {
+                statusElement.textContent = 'Read';
+            }, 1000); // Update to "Read" after 1 second
+        }
+
+        // Function to simulate receiving a reply
         function receiveMessage() {
             setTimeout(() => {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', 'received');
-                messageElement.textContent = 'This is a reply.';
+                const receivedMessageElement = document.createElement('div');
+                receivedMessageElement.classList.add('message', 'received');
+                receivedMessageElement.textContent = 'This is an automated reply.';
 
                 const timestampElement = document.createElement('span');
                 timestampElement.classList.add('timestamp');
                 timestampElement.textContent = getCurrentTime();
 
-                messageElement.appendChild(timestampElement);
-                chatWindow.appendChild(messageElement);
+                receivedMessageElement.appendChild(timestampElement);
+                chatWindow.appendChild(receivedMessageElement);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-            }, 1500);
+            }, 1500); // Simulate receiving a message after 1.5 seconds
         }
 
-        // Event listener for send button
         sendButton.addEventListener('click', sendMessage);
-
-        // Event listener for pressing 'Enter' key
-        messageInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        // Event listener for emoji button
-        emojiButton.addEventListener('click', function() {
-            emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'flex' : 'none';
+        emojiButton.addEventListener('click', function () {
+            emojiPicker.style.display = emojiPicker.style.display === 'flex' ? 'none' : 'flex';
         });
 
-        // Event listener for emoji selection
-        emojiPicker.addEventListener('click', function(event) {
-            if (event.target.classList.contains('emoji')) {
-                messageInput.value += event.target.textContent;
+        document.querySelectorAll('.emoji').forEach(function (emoji) {
+            emoji.addEventListener('click', function () {
+                messageInput.value += emoji.textContent;
                 emojiPicker.style.display = 'none';
-                messageInput.focus();
-            }
+            });
         });
 
-        // Event listener for file input change (image upload)
-        fileInput.addEventListener('change', function(event) {
+        fileLabel.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     sendImage(e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Event listener for audio button
-        audioButton.addEventListener('click', sendAudio);
+        audioButton.addEventListener('click', function () {
+            sendAudio('path_to_audio_file.mp3'); // Replace with actual audio file path
+        });
 
+        gifButton.addEventListener('click', function () {
+            gifPicker.style.display = gifPicker.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        document.querySelectorAll('.gif-option').forEach(function (gifOption) {
+            gifOption.addEventListener('click', function () {
+                sendGif(gifOption.src);
+                gifPicker.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
